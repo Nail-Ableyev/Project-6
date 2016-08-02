@@ -86,16 +86,16 @@ $(function() {
          * the use of Jasmine's beforeEach and asynchronous done() function.
          */
         beforeEach(function(done){
-            $('.feed').empty();
-            loadFeed(0,function(){
-            done();
-            });
+            //CHANGED: deleted empty()ing 'feed'- Not necessary
+
+            loadFeed(0,done);//CHANGED: callback version is used
         });
 
-        it("have at least something", function(done){
-            var anEntry = $('.feed').find('h2').text();
-            expect(anEntry.length).not.toBe(0);
-            done();
+        //CHANGED: done is removed as the function argument and its invocation 
+        it("have at least something", function(){
+            //CHANGED: grab the contents of .entry class istead of the text() in it
+            var theEntries = $('.feed .entry'); 
+            expect(theEntries.length).not.toBe(0);
         });
     });
 
@@ -113,11 +113,15 @@ $(function() {
             $('.feed').empty();
             loadFeed(0,function(){
                 initialEntry=$('.feed').find('h2').text();
+                /*CHANGED: the following function is nested inside
+                the previous function to make sure that they are executed
+                in sequence despite being asyncronous 
+                */
+                loadFeed(1,function(){
+                    nextEntry=$('.feed').find('h2').text();
+                    done();
+                }); 
             });
-            loadFeed(1,function(){
-                nextEntry=$('.feed').find('h2').text();
-                done();
-            });  
         });
 
         it("actually changes the content",function(done){
